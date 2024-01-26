@@ -24,7 +24,6 @@ namespace MarketEase_API.Pesistence
 
             modelBuilder.Entity<Product>(e =>
             {
-                
             });
         }
     }
