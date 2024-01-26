@@ -16,7 +16,7 @@ namespace MarketEase_API.Controllers
             _context = context;
         }
 
-        [HttpGet("api/Market-Systemy/Products")]
+        [HttpGet]
         public IActionResult AllProducts()
         {
             var products = _context.products.Where(de => !de.IsDeleted).ToList();
@@ -74,15 +74,68 @@ namespace MarketEase_API.Controllers
             }
 
             product.Delete();
-
+            _context.SaveChanges();
             return Ok(product);
         }
 
-        
+        [HttpGet("api/Market-Systemy/Packaging")]
+        public IActionResult GetAllPackaging()
+        {
+            var products = _context.packaging.Where(de => !de.IsDeleted).ToList();
+            return Ok(products);
+        }
 
+        [HttpGet("api/Market-Systemy/Packaging/{id}")]
+        public IActionResult GetPackagingById(int id)
+        {
+            var pack = _context.packaging.SingleOrDefault(de => de.Id == id);
 
+            if (pack == null)
+            {
+                return NotFound();
+            }
 
+            return Ok(pack);
+        }
 
+        [HttpPost("api/Market-Systemy/Packaging")]
+        public IActionResult RegisterPackaging(PackagingTypes packaging)
+        {
+            _context.packaging.Add(packaging);
+            _context.SaveChanges();
+            return Created(); // Se possível, retorne a URI do novo recurso criado.
+        }
 
+        [HttpPut("api/Market-Systemy/Packaging/{id}")]
+        public IActionResult UpdatePackaging(int id, [FromBody] PackagingTypes input)
+        {
+            var pack = _context.packaging.SingleOrDefault(de => de.Id == id);
+
+            if (pack == null)
+            {
+                return NotFound();
+            }
+
+            pack.Update(input.Size, input.Fragility);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("api/Market-Systemy/Packaging/{id}")]
+        public IActionResult DeletePackaging(int id)
+        {
+            var product = _context.packaging.SingleOrDefault(de => de.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            product.Delete();
+            _context.SaveChanges();
+
+            return NoContent();
+        }
     }
 }

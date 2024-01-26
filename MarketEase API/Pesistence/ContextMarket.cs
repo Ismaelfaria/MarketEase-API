@@ -30,7 +30,7 @@ namespace MarketEase_API.Pesistence
                 e.HasKey(p => p.Id);
 
                 e.Property(de => de.Name)
-                .IsRequired(false);
+                .IsRequired(true);
             });
         }
     }
