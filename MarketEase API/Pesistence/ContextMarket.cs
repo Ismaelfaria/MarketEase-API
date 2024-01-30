@@ -21,16 +21,12 @@ namespace MarketEase_API.Pesistence
                 .WithOne()
                 .HasForeignKey(s => s.PackagingTypesId);
 
-                e.Property(de => de.Size)
-                .IsRequired(true);
             });
 
             modelBuilder.Entity<Product>(e =>
             {
                 e.HasKey(p => p.Id);
 
-                e.Property(de => de.Name)
-                .IsRequired(true);
             });
         }
     }

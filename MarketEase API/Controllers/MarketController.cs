@@ -1,4 +1,7 @@
-﻿using MarketEase_API.Entity;
+﻿using AutoMapper;
+using MarketEase_API.Entity;
+using MarketEase_API.Mapper;
+using MarketEase_API.Model;
 using MarketEase_API.Pesistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +13,12 @@ namespace MarketEase_API.Controllers
     public class MarketController : ControllerBase
     {
         private readonly ContextMarket _context;
+        private readonly IMapper _mapper;
 
-        public MarketController(ContextMarket context)
+        public MarketController(ContextMarket context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -21,7 +26,9 @@ namespace MarketEase_API.Controllers
         {
             var products = _context.products.Where(de => !de.IsDeleted).ToList();
 
-            return Ok(products);
+            var viewModel = _mapper.Map<List<ProductViewModel>>(products);
+
+            return Ok(viewModel);
         }
 
         [HttpGet("{id}")]
@@ -34,20 +41,24 @@ namespace MarketEase_API.Controllers
                 return NotFound();
             }
 
+            var viewModel = _mapper.Map<ProductViewModel>(product);
+
             return Ok(product);
         }
 
         [HttpPost]
-        public IActionResult RegisterProducts(Product product)
+        public IActionResult RegisterProducts(ProductInputModel product)
         {
-            _context.products.Add(product);
+            var inputModel = _mapper.Map<Product>(product);
+
+            _context.products.Add(inputModel);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(Product), new { id = product.Id }, product);
+            return CreatedAtAction(nameof(Product), new { id = inputModel.Id }, inputModel);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateProduct(int id, Product input)
+        public IActionResult UpdateProduct(int id, ProductInputModel input)
         {
             var product = _context.products.SingleOrDefault(de => de.Id == id);
 
@@ -81,8 +92,10 @@ namespace MarketEase_API.Controllers
         [HttpGet("api/Market-Systemy/Packaging")]
         public IActionResult GetAllPackaging()
         {
-            var products = _context.packaging.Where(de => !de.IsDeleted).ToList();
-            return Ok(products);
+            var pack = _context.packaging.Where(de => !de.IsDeleted).ToList();
+
+            var viewModel = _mapper.Map<List<PackViewModel>>(pack);
+            return Ok(viewModel);
         }
 
         [HttpGet("api/Market-Systemy/Packaging/{id}")]
@@ -94,20 +107,24 @@ namespace MarketEase_API.Controllers
             {
                 return NotFound();
             }
+            var viewModel = _mapper.Map<PackViewModel>(pack);
 
-            return Ok(pack);
+            return Ok(viewModel);
         }
 
         [HttpPost("api/Market-Systemy/Packaging")]
-        public IActionResult RegisterPackaging(PackagingTypes packaging)
+        public IActionResult RegisterPackaging(PackInputModel packaging)
         {
-            _context.packaging.Add(packaging);
+            var viewInput = _mapper.Map<PackagingTypes>(packaging);
+
+            _context.packaging.Add(viewInput);
             _context.SaveChanges();
-            return Created(); // Se possível, retorne a URI do novo recurso criado.
+
+            return CreatedAtAction(nameof(GetPackagingById), new { id = viewInput.Id }, viewInput); 
         }
 
         [HttpPut("api/Market-Systemy/Packaging/{id}")]
-        public IActionResult UpdatePackaging(int id, [FromBody] PackagingTypes input)
+        public IActionResult UpdatePackaging(int id, PackInputModel input)
         {
             var pack = _context.packaging.SingleOrDefault(de => de.Id == id);
 

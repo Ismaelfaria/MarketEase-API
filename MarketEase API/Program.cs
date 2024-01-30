@@ -1,3 +1,4 @@
+using MarketEase_API.Mapper;
 using MarketEase_API.Pesistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ var ConnectionString = builder.Configuration.GetConnectionString("MarketConnecti
 
 builder.Services.AddDbContext<ContextMarket>(o => o.UseSqlServer(ConnectionString));
 
+builder.Services.AddAutoMapper(typeof(MarketProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
